@@ -1,0 +1,24 @@
+{
+  "name": "Morgen Routine",
+  "short_name": "Morgen",
+  "description": "10 Min Morgen-Routine \u00b7 Tom",
+  "start_url": "/morgen-routine/",
+  "display": "standalone",
+  "background_color": "#1a1612",
+  "theme_color": "#e07840",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
