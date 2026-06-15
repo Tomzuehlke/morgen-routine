@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Morgen-Routine · Tom</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Morgen Routine">
+<meta name="theme-color" content="#e07840">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap');
+
+  :root {
+    --bg: #1a1612;
+    --surface: #252018;
+    --card: #2e2820;
+    --border: #3d3528;
+    --accent: #e07840;
+    --accent2: #5ba3c9;
+    --green: #5aaa66;
+    --text: #f0e8df;
+    --muted: #8c7b6e;
+    --dim: #5a4f45;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display:none; flex-direction:column; align-items:center; min-height:100vh; padding:24px 20px 40px; }
+  .screen.active { display:flex; }
+
+  /* ── START SCREEN ── */
+  #start-screen {
+    justify-content: center;
+    gap: 28px;
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 0%, #3d2e1a 0%, var(--bg) 70%);
+  }
+
+  .start-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .start-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 8vw, 3.6rem);
+    font-weight: 900;
+    line-height: 1.05;
+  }
+
+  .start-title em { font-style: italic; color: var(--accent); }
+
+  .start-meta {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+
+  .pill-o { color: var(--accent); border-color: var(--accent); }
+  .pill-b { color: var(--accent2); border-color: var(--accent2); }
+  .pill-g { color: var(--green); border-color: var(--green); }
+
+  .exercise-list {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+  }
+
+  .ex-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+
+  .ex-list-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    width: 18px;
+    flex-shrink: 0;
+  }
+
+  .ex-list-name { flex: 1; font-weight: 400; color: var(--text); }
+
+  .ex-list-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+
+  .btn-start {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 16px 48px;
+    border-radius: 50px;
+    font-family: 'Lato', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+    box-shadow: 0 8px 30px rgba(224,120,64,0.3);
+  }
+
+  .btn-start:active { transform: scale(0.97); }
+
+  .start-note {
+    font-size: 0.75rem;
+    color: var(--dim);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── MAIN WORKOUT SCREEN ── */
+  #workout-screen {
+    gap: 0;
+    padding: 0;
+  }
+
+  /* Progress bar */
+  .progress-bar-wrap {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  #progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* Top nav */
+  .workout-top {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    flex-shrink: 0;
+  }
+
+  .workout-counter {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .workout-counter span { color: var(--text); font-weight: 500; }
+
+  .btn-skip-end {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--dim);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+
+  /* Exercise name area */
+  .ex-header {
+    width: 100%;
+    padding: 8px 20px 16px;
+    flex-shrink: 0;
+  }
+
+  .ex-step-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    min-height: 18px;
+  }
+
+  .ex-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--text);
+  }
+
+  .ex-num-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+
+  /* Timer circle */
+  .timer-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 20px;
+    min-height: 0;
+  }
+
+  .timer-wrap {
+    position: relative;
+    width: min(260px, 65vw);
+    height: min(260px, 65vw);
+    flex-shrink: 0;
+  }
+
+  .timer-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .timer-bg-circle {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 6;
+  }
+
+  .timer-progress-circle {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear, stroke 0.3s;
+  }
+
+  .timer-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  #timer-display {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 12vw, 4rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .timer-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* Description */
+  .ex-desc-box {
+    width: 100%;
+    padding: 0 20px 8px;
+    flex-shrink: 0;
+  }
+
+  #ex-description {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #b0a090;
+    font-weight: 300;
+    text-align: center;
+  }
+
+  #ex-tip {
+    margin-top: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent2);
+    text-align: center;
+    display: none;
+  }
+
+  /* Controls */
+  .controls {
+    width: 100%;
+    padding: 16px 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  .btn-ctrl {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
+  }
+
+  .btn-ctrl:active { transform: scale(0.94); }
+  .btn-ctrl:hover { background: var(--card); }
+
+  .btn-ctrl.sm { width: 52px; height: 52px; }
+  .btn-ctrl.lg {
+    width: 72px; height: 72px;
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 6px 24px rgba(224,120,64,0.35);
+  }
+
+  .btn-ctrl.lg:hover { background: #d06830; }
+
+  .btn-ctrl svg { pointer-events: none; }
+
+  /* Dot nav */
+  .dot-nav {
+    width: 100%;
+    padding: 0 20px 20px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.3s, transform 0.2s;
+    cursor: pointer;
+  }
+
+  .dot.done { background: var(--dim); }
+  .dot.active { background: var(--accent); transform: scale(1.4); }
+
+  /* ── NEXT-UP overlay inside timer ── */
+  #next-banner {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(26,22,18,0.92);
+    border-radius: 50%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+  }
+
+  #next-banner.show { display: flex; }
+
+  .next-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .next-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  #next-countdown {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.6rem;
+    color: var(--accent);
+    margin-top: 4px;
+  }
+
+  /* ── FINISH SCREEN ── */
+  #finish-screen {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 24px;
+    background: radial-gradient(ellipse at 50% 30%, #1a3020 0%, var(--bg) 70%);
+  }
+
+  .finish-icon {
+    font-size: 4rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .finish-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 7vw, 3rem);
+    font-weight: 900;
+    color: var(--green);
+  }
+
+  .finish-sub {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 300px;
+  }
+
+  .finish-stats {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+  }
+
+  .finish-stat {
+    text-align: center;
+  }
+
+  .finish-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .finish-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .btn-restart {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 32px;
+    border-radius: 30px;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-restart:hover { background: var(--surface); }
+
+  /* Speech indicator */
+  .speech-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+    animation: blink 1s ease-in-out infinite;
+    margin-left: 6px;
+    vertical-align: middle;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .speech-dot.speaking { opacity: 1; }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  .paused-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    display: none;
+    text-align: center;
+    padding-bottom: 4px;
+  }
+
+  .paused-label.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ═══ START SCREEN ═══ -->
+<div id="start-screen" class="screen active">
+  <div class="start-eyebrow">Morgen-Routine · Täglich · 10 Minuten</div>
+  <div class="start-title">Guten<br><em>Morgen</em></div>
+  <div class="start-meta">
+    <span class="meta-pill pill-o">Schulter-Arthrose</span>
+    <span class="meta-pill pill-b">Büro-Haltung</span>
+    <span class="meta-pill pill-g">MTB Enduro</span>
+  </div>
+  <div class="exercise-list" id="start-list"></div>
+  <button class="btn-start" onclick="startWorkout()">▶ Routine starten</button>
+  <div class="start-note">Ton an · Lautsprecher für Ansagen</div>
+</div>
+
+<!-- ═══ WORKOUT SCREEN ═══ -->
+<div id="workout-screen" class="screen">
+  <div class="progress-bar-wrap"><div id="progress-fill"></div></div>
+
+  <div class="workout-top">
+    <div class="workout-counter">Übung <span id="ex-counter">1</span> / 10</div>
+    <button class="btn-skip-end" onclick="goToFinish()">Beenden ✕</button>
+  </div>
+
+  <div class="ex-header">
+    <div class="ex-step-label" id="step-label">—</div>
+    <div class="ex-title" id="ex-title">—</div>
+    <div class="ex-num-label" id="ex-num-label"></div>
+  </div>
+
+  <div class="timer-section">
+    <div class="timer-wrap">
+      <svg class="timer-svg" viewBox="0 0 100 100">
+        <circle class="timer-bg-circle" cx="50" cy="50" r="44"/>
+        <circle class="timer-progress-circle" id="timer-circle" cx="50" cy="50" r="44"
+          stroke-dasharray="276.46" stroke-dashoffset="0"/>
+      </svg>
+      <div class="timer-center">
+        <div id="timer-display">0:00</div>
+        <div class="timer-label">SEKUNDEN<span class="speech-dot" id="speech-dot"></span></div>
+      </div>
+      <div id="next-banner">
+        <div class="next-label">Als nächstes</div>
+        <div class="next-name" id="next-name">—</div>
+        <div id="next-countdown">3</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ex-desc-box">
+    <div class="paused-label" id="paused-label">— PAUSIERT —</div>
+    <div id="ex-description">—</div>
+    <div id="ex-tip"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-ctrl sm" onclick="goBack()" title="Zurück">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/>
+      </svg>
+    </button>
+    <button class="btn-ctrl lg" id="play-btn" onclick="togglePlay()" title="Play/Pause">
+      <svg id="play-icon" width="28" height="28" viewBox="0 0 24 24" fill="white" stroke="none">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+      <svg id="pause-icon" width="28" height="28" viewBox="0 0 24 24" fill="white" stroke="none" style="display:none">
+        <rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>
+      </svg>
+    </button>
+    <button class="btn-ctrl sm" onclick="skipForward()" title="Nächste Übung">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="dot-nav" id="dot-nav"></div>
+</div>
+
+<!-- ═══ FINISH SCREEN ═══ -->
+<div id="finish-screen" class="screen">
+  <div class="finish-icon">🌅</div>
+  <div class="finish-title">Fertig!</div>
+  <div class="finish-sub">Ausgezeichnet. Deine 10-Minuten-Routine ist abgeschlossen. Schultern, Hüfte und Rücken sind bereit für den Tag.</div>
+  <div class="finish-stats">
+    <div class="finish-stat">
+      <div class="finish-stat-num">10</div>
+      <div class="finish-stat-label">Übungen</div>
+    </div>
+    <div class="finish-stat">
+      <div class="finish-stat-num">~10</div>
+      <div class="finish-stat-label">Minuten</div>
+    </div>
+    <div class="finish-stat">
+      <div class="finish-stat-num">✓</div>
+      <div class="finish-stat-label">Schulter</div>
+    </div>
+  </div>
+  <button class="btn-restart" onclick="restart()">↺ Nochmal starten</button>
+</div>
+
+<script>
+// ═══════════════════════════════
+// EXERCISE DATA
+// ═══════════════════════════════
+const EXERCISES = [
+  {
+    num: 1, name: "Katze-Kuh", totalTime: "90 Sek.",
+    steps: [{
+      label: "Beide Seiten",
+      duration: 90,
+      desc: "Vierfüßlerstand. Einatmen → Rücken hohlmachen, Kopf heben (Kuh). Ausatmen → Rücken runden, Schulterblätter spreizen (Katze). Langsam, mit Atemrhythmus.",
+      tip: "→ 10 Wdh., dann 10x nur Brustwirbelsäule isolieren",
+      speech: "Übung 1: Katze Kuh. Vierfüßlerstand. Einatmen, Rücken hohlmachen, Kopf heben. Ausatmen, Rücken runden, Schulterblätter spreizen. Langsam mit dem Atemrhythmus. 90 Sekunden."
+    }]
+  },
+  {
+    num: 2, name: "Thread the Needle", totalTime: "60 Sek.",
+    steps: [
+      {
+        label: "Rechte Seite",
+        duration: 30,
+        desc: "Vierfüßlerstand. Rechten Arm unter dem Körper hindurchfädeln, bis Schulter und Wange am Boden liegen. Mit Atemzügen tiefer werden.",
+        tip: "→ Kein Schmerz — nur leichtes Ziehen",
+        speech: "Übung 2: Thread the Needle. Rechte Seite. Rechten Arm unter dem Körper hindurchfädeln bis Schulter am Boden liegt. 30 Sekunden halten."
+      },
+      {
+        label: "Linke Seite",
+        duration: 30,
+        desc: "Linken Arm unter dem Körper hindurchfädeln, bis Schulter und Wange am Boden liegen. Mit Atemzügen tiefer werden.",
+        tip: "→ Kein Schmerz — nur leichtes Ziehen",
+        speech: "Seite wechseln. Linke Seite. 30 Sekunden halten."
+      }
+    ]
+  },
+  {
+    num: 3, name: "Brust-Öffnung", totalTime: "60 Sek.",
+    steps: [
+      {
+        label: "Rechte Seite",
+        duration: 30,
+        desc: "Rechten Arm 90° an die Wand. Körper langsam wegdrehen bis ein Zug in der Brust spürbar ist.",
+        tip: "→ Arm-Höhe variieren: 90°, 120°, 60° testen",
+        speech: "Übung 3: Brust Öffnung an der Wand. Rechte Seite. Arm auf 90 Grad anlehnen, Körper wegdrehen bis Zug in der Brust spürbar. 30 Sekunden."
+      },
+      {
+        label: "Linke Seite",
+        duration: 30,
+        desc: "Linken Arm 90° an die Wand. Körper langsam wegdrehen bis ein Zug in der Brust spürbar ist.",
+        tip: "→ Arm-Höhe variieren: 90°, 120°, 60° testen",
+        speech: "Seite wechseln. Linke Seite. 30 Sekunden."
+      }
+    ]
+  },
+  {
+    num: 4, name: "Sleeper Stretch", totalTime: "60 Sek.",
+    steps: [
+      {
+        label: "Rechte Schulter",
+        duration: 30,
+        desc: "Auf der rechten Seite liegen, Arm 90° vor dem Körper. Linke Hand drückt den Unterarm sanft Richtung Boden.",
+        tip: "→ Nur leichtes Ziehen hinten — kein Schmerz",
+        speech: "Übung 4: Sleeper Stretch. Rechte Schulter. Auf der rechten Seite liegen, Arm 90 Grad vor dem Körper. Linke Hand drückt den Unterarm sanft Richtung Boden. Kein Schmerz. 30 Sekunden."
+      },
+      {
+        label: "Linke Schulter",
+        duration: 30,
+        desc: "Auf der linken Seite liegen, Arm 90° vor dem Körper. Rechte Hand drückt den Unterarm sanft Richtung Boden.",
+        tip: "→ Nur leichtes Ziehen hinten — kein Schmerz",
+        speech: "Seite wechseln. Linke Schulter. 30 Sekunden."
+      }
+    ]
+  },
+  {
+    num: 5, name: "Hüftbeuger", totalTime: "60 Sek.",
+    steps: [
+      {
+        label: "Rechts vorne",
+        duration: 30,
+        desc: "Tiefer Ausfallschritt, linkes Knie am Boden. Becken nach vorne-unten schieben, Oberkörper aufrecht.",
+        tip: "→ Arm der gleichen Seite nach oben für mehr Tiefe",
+        speech: "Übung 5: Hüftbeuger Dehnung. Rechtes Bein vorne, linkes Knie am Boden. Becken nach vorne unten schieben, Oberkörper aufrecht halten. 30 Sekunden."
+      },
+      {
+        label: "Links vorne",
+        duration: 30,
+        desc: "Tiefer Ausfallschritt, rechtes Knie am Boden. Becken nach vorne-unten schieben, Oberkörper aufrecht.",
+        tip: "→ Arm der gleichen Seite nach oben für mehr Tiefe",
+        speech: "Seite wechseln. Linkes Bein vorne. 30 Sekunden."
+      }
+    ]
+  },
+  {
+    num: 6, name: "Piriformis-Dehnung", totalTime: "60 Sek.",
+    steps: [
+      {
+        label: "Rechte Seite",
+        duration: 30,
+        desc: "Auf dem Rücken liegen. Rechtes Bein über das linke legen (Figur 4). Linkes Bein zum Körper ziehen.",
+        tip: "→ Liegend ausführen — schont die Knie",
+        speech: "Übung 6: Piriformis Dehnung. Auf dem Rücken liegen. Rechtes Bein über das linke, Figur 4. Linkes Bein zum Körper ziehen. 30 Sekunden."
+      },
+      {
+        label: "Linke Seite",
+        duration: 30,
+        desc: "Auf dem Rücken liegen. Linkes Bein über das rechte legen (Figur 4). Rechtes Bein zum Körper ziehen.",
+        tip: "→ Liegend ausführen — schont die Knie",
+        speech: "Seite wechseln. Linkes Bein über rechtes. 30 Sekunden."
+      }
+    ]
+  },
+  {
+    num: 7, name: "Nacken-Seitneigung", totalTime: "45 Sek.",
+    steps: [
+      {
+        label: "Rechte Seite",
+        duration: 22,
+        desc: "Ohr zur rechten Schulter neigen. Linke Hand zieht leicht am Oberschenkel nach unten. Reine Neigung — keine Rotation.",
+        tip: "→ 3 Richtungen: seitlich, diagonal vorne, diagonal hinten",
+        speech: "Übung 7: Nacken Seitneigung. Rechte Seite. Ohr zur Schulter neigen, gegenüberliegende Hand zieht am Oberschenkel. Keine Rotation. 20 Sekunden."
+      },
+      {
+        label: "Linke Seite",
+        duration: 23,
+        desc: "Ohr zur linken Schulter neigen. Rechte Hand zieht leicht am Oberschenkel nach unten. Reine Neigung — keine Rotation.",
+        tip: "→ 3 Richtungen: seitlich, diagonal vorne, diagonal hinten",
+        speech: "Seite wechseln. Linke Seite. 20 Sekunden."
+      }
+    ]
+  },
+  {
+    num: 8, name: "Hamstring-Dehnung", totalTime: "45 Sek.",
+    steps: [
+      {
+        label: "Rechtes Bein",
+        duration: 22,
+        desc: "Rechtes Bein gestreckt auf erhöhter Fläche (Stuhl, Treppenstufe). Oberkörper gestreckt vorbeugen — Rücken bleibt gerade.",
+        tip: "→ Rücken gerade — nicht krumm vorbeugen",
+        speech: "Übung 8: Hamstring Dehnung. Rechtes Bein gestreckt auf einer erhöhten Fläche. Oberkörper gestreckt vorbeugen, Rücken bleibt gerade. 20 Sekunden."
+      },
+      {
+        label: "Linkes Bein",
+        duration: 23,
+        desc: "Linkes Bein gestreckt auf erhöhter Fläche. Oberkörper gestreckt vorbeugen — Rücken bleibt gerade.",
+        tip: "→ Rücken gerade — nicht krumm vorbeugen",
+        speech: "Seite wechseln. Linkes Bein. 20 Sekunden."
+      }
+    ]
+  },
+  {
+    num: 9, name: "Thorax-Rotation", totalTime: "45 Sek.",
+    steps: [{
+      label: "Beide Seiten",
+      duration: 45,
+      desc: "Sitzend, Arme vor der Brust verschränken. Aus der Brustwirbelsäule nach links und rechts rotieren. Becken bleibt still.",
+      tip: "→ Bewegung kommt nur aus dem Brustkorb — nicht aus der Lendenwirbelsäule",
+      speech: "Übung 9: Thorax Rotation. Sitzend, Arme verschränken. Aus der Brustwirbelsäule nach links und rechts rotieren. Becken bleibt still. 10 Mal pro Seite. 45 Sekunden."
+    }]
+  },
+  {
+    num: 10, name: "Child's Pose", totalTime: "60 Sek.",
+    steps: [
+      {
+        label: "Mitte",
+        duration: 30,
+        desc: "Knie breit, Gesäß Richtung Fersen. Arme weit nach vorne strecken, Stirn am Boden. Mit jedem Ausatmen schwerer werden.",
+        tip: "→ Mit jedem Ausatmen tiefer sinken lassen",
+        speech: "Letzte Übung! Nummer 10: Extended Child's Pose. Knie breit, Gesäß Richtung Fersen, Arme weit nach vorne. Mit jedem Ausatmen schwerer werden lassen. 30 Sekunden."
+      },
+      {
+        label: "Arme nach rechts",
+        duration: 15,
+        desc: "Arme nach rechts verschieben für seitliche Dehnung des Latissimus.",
+        tip: "",
+        speech: "Arme nach rechts verschieben. 15 Sekunden."
+      },
+      {
+        label: "Arme nach links",
+        duration: 15,
+        desc: "Arme nach links verschieben für seitliche Dehnung.",
+        tip: "",
+        speech: "Arme nach links verschieben. Letzte 15 Sekunden. Fast fertig!"
+      }
+    ]
+  }
+];
+
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+let exIdx = 0, stepIdx = 0, timeLeft = 0, totalTime = 0;
+let timerInterval = null, isPlaying = false;
+let nextCountdown = null;
+const CIRCUMFERENCE = 2 * Math.PI * 44; // 276.46
+
+// ═══════════════════════════════
+// SPEECH
+// ═══════════════════════════════
+let voices = [];
+window.speechSynthesis.onvoiceschanged = () => { voices = window.speechSynthesis.getVoices(); };
+setTimeout(() => { voices = window.speechSynthesis.getVoices(); }, 200);
+
+function speak(text, onEnd) {
+  if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'de-DE';
+  utt.rate = 0.88;
+  utt.pitch = 1.05;
+  const deVoice = voices.find(v => v.lang && v.lang.startsWith('de'));
+  if (deVoice) utt.voice = deVoice;
+  const dot = document.getElementById('speech-dot');
+  if (dot) { dot.classList.add('speaking'); }
+  utt.onend = () => {
+    if (dot) dot.classList.remove('speaking');
+    if (onEnd) onEnd();
+  };
+  utt.onerror = () => {
+    if (dot) dot.classList.remove('speaking');
+    if (onEnd) onEnd();
+  };
+  window.speechSynthesis.speak(utt);
+}
+
+// ═══════════════════════════════
+// BEEP
+// ═══════════════════════════════
+function beep(freq = 523, dur = 0.18, vol = 0.25) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    g.gain.setValueAtTime(vol, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+function chime() { beep(660, 0.15); setTimeout(() => beep(880, 0.2), 160); }
+
+// ═══════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════
+function fmtTime(s) {
+  const m = Math.floor(s / 60), r = s % 60;
+  return m > 0 ? `${m}:${String(r).padStart(2,'0')}` : `${r}`;
+}
+
+function updateTimerCircle() {
+  const circle = document.getElementById('timer-circle');
+  if (!circle) return;
+  const pct = totalTime > 0 ? timeLeft / totalTime : 0;
+  circle.style.strokeDashoffset = CIRCUMFERENCE * (1 - pct);
+  // Color shifts as time runs out
+  if (pct > 0.4) circle.style.stroke = 'var(--accent)';
+  else if (pct > 0.15) circle.style.stroke = '#d4a030';
+  else circle.style.stroke = '#c05050';
+}
+
+function updateUI() {
+  const ex = EXERCISES[exIdx];
+  const step = ex.steps[stepIdx];
+  const totalSteps = EXERCISES.reduce((a, e) => a + e.steps.length, 0);
+  let doneSteps = 0;
+  for (let i = 0; i < exIdx; i++) doneSteps += EXERCISES[i].steps.length;
+  doneSteps += stepIdx;
+
+  // Progress bar
+  document.getElementById('progress-fill').style.width = (doneSteps / totalSteps * 100) + '%';
+
+  // Counter
+  document.getElementById('ex-counter').textContent = ex.num;
+
+  // Exercise info
+  document.getElementById('step-label').textContent = step.label;
+  document.getElementById('ex-title').textContent = ex.name;
+  document.getElementById('ex-num-label').textContent =
+    ex.steps.length > 1 ? `Schritt ${stepIdx + 1} von ${ex.steps.length}` : '';
+  document.getElementById('ex-description').textContent = step.desc;
+
+  const tipEl = document.getElementById('ex-tip');
+  if (step.tip) { tipEl.textContent = step.tip; tipEl.style.display = 'block'; }
+  else tipEl.style.display = 'none';
+
+  // Timer
+  document.getElementById('timer-display').textContent = fmtTime(timeLeft);
+  updateTimerCircle();
+
+  // Dots
+  updateDots();
+}
+
+function updateDots() {
+  const nav = document.getElementById('dot-nav');
+  nav.innerHTML = '';
+  EXERCISES.forEach((ex, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i < exIdx ? ' done' : i === exIdx ? ' active' : '');
+    dot.title = ex.name;
+    dot.onclick = () => jumpToExercise(i);
+    nav.appendChild(dot);
+  });
+}
+
+function updatePlayButton() {
+  document.getElementById('play-icon').style.display = isPlaying ? 'none' : 'block';
+  document.getElementById('pause-icon').style.display = isPlaying ? 'block' : 'none';
+  const pl = document.getElementById('paused-label');
+  pl.classList.toggle('show', !isPlaying);
+}
+
+// ═══════════════════════════════
+// TIMER LOGIC
+// ═══════════════════════════════
+function tick() {
+  if (timeLeft > 0) {
+    timeLeft--;
+    document.getElementById('timer-display').textContent = fmtTime(timeLeft);
+    updateTimerCircle();
+    if (timeLeft === 5) speak("Noch 5 Sekunden.");
+    if (timeLeft === 3) beep(440);
+    if (timeLeft === 2) beep(440);
+    if (timeLeft === 1) beep(440);
+  } else {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    chime();
+    showNextBanner();
+  }
+}
+
+function showNextBanner() {
+  // Determine what comes next
+  const ex = EXERCISES[exIdx];
+  let nextName = null;
+  if (stepIdx < ex.steps.length - 1) {
+    nextName = ex.steps[stepIdx + 1].label;
+  } else if (exIdx < EXERCISES.length - 1) {
+    nextName = EXERCISES[exIdx + 1].name;
+  }
+
+  if (!nextName) { advanceStep(); return; }
+
+  const banner = document.getElementById('next-banner');
+  const nameEl = document.getElementById('next-name');
+  const countEl = document.getElementById('next-countdown');
+  nameEl.textContent = nextName;
+  banner.classList.add('show');
+
+  let c = 3;
+  countEl.textContent = c;
+  nextCountdown = setInterval(() => {
+    c--;
+    if (c > 0) { countEl.textContent = c; beep(330, 0.1, 0.15); }
+    else {
+      clearInterval(nextCountdown);
+      banner.classList.remove('show');
+      advanceStep();
+    }
+  }, 1000);
+}
+
+function advanceStep() {
+  const ex = EXERCISES[exIdx];
+  if (stepIdx < ex.steps.length - 1) {
+    stepIdx++;
+    loadStep();
+  } else if (exIdx < EXERCISES.length - 1) {
+    exIdx++;
+    stepIdx = 0;
+    loadStep();
+  } else {
+    goToFinish();
+  }
+}
+
+function loadStep(autoPlay = true) {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  if (nextCountdown) { clearInterval(nextCountdown); nextCountdown = null; }
+  document.getElementById('next-banner').classList.remove('show');
+
+  const step = EXERCISES[exIdx].steps[stepIdx];
+  timeLeft = step.duration;
+  totalTime = step.duration;
+  updateUI();
+
+  if (autoPlay) {
+    isPlaying = true;
+    updatePlayButton();
+    speak(step.speech, () => {
+      if (isPlaying && !timerInterval) {
+        timerInterval = setInterval(tick, 1000);
+      }
+    });
+  }
+}
+
+// ═══════════════════════════════
+// CONTROLS
+// ═══════════════════════════════
+function togglePlay() {
+  if (!isPlaying) {
+    isPlaying = true;
+    updatePlayButton();
+    if (timeLeft === (EXERCISES[exIdx].steps[stepIdx].duration)) {
+      // Fresh start — speak first
+      const step = EXERCISES[exIdx].steps[stepIdx];
+      speak(step.speech, () => {
+        if (isPlaying && !timerInterval) timerInterval = setInterval(tick, 1000);
+      });
+    } else {
+      if (!timerInterval) timerInterval = setInterval(tick, 1000);
+      window.speechSynthesis.resume();
+    }
+  } else {
+    isPlaying = false;
+    updatePlayButton();
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    if (nextCountdown) { clearInterval(nextCountdown); nextCountdown = null; document.getElementById('next-banner').classList.remove('show'); }
+    window.speechSynthesis.pause();
+  }
+}
+
+function skipForward() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  if (nextCountdown) { clearInterval(nextCountdown); nextCountdown = null; }
+  document.getElementById('next-banner').classList.remove('show');
+  window.speechSynthesis.cancel();
+  advanceStep();
+}
+
+function goBack() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  if (nextCountdown) { clearInterval(nextCountdown); nextCountdown = null; }
+  document.getElementById('next-banner').classList.remove('show');
+  window.speechSynthesis.cancel();
+
+  if (stepIdx > 0) { stepIdx--; }
+  else if (exIdx > 0) { exIdx--; stepIdx = EXERCISES[exIdx].steps.length - 1; }
+
+  isPlaying = true;
+  loadStep();
+}
+
+function jumpToExercise(i) {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  if (nextCountdown) { clearInterval(nextCountdown); nextCountdown = null; }
+  document.getElementById('next-banner').classList.remove('show');
+  window.speechSynthesis.cancel();
+  exIdx = i; stepIdx = 0;
+  isPlaying = true;
+  loadStep();
+  updatePlayButton();
+}
+
+function goToFinish() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  if (nextCountdown) { clearInterval(nextCountdown); nextCountdown = null; }
+  window.speechSynthesis.cancel();
+  isPlaying = false;
+  releaseWakeLock();
+  showScreen('finish-screen');
+  document.getElementById('progress-fill').style.width = '100%';
+  setTimeout(() => speak("Sehr gut! Deine Morgenroutine ist abgeschlossen. Genieße den Tag, Tom!"), 600);
+}
+
+// ═══════════════════════════════
+// SCREENS
+// ═══════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startWorkout() {
+  exIdx = 0; stepIdx = 0; isPlaying = false;
+  showScreen('workout-screen');
+  loadStep(false);
+  updatePlayButton();
+  requestWakeLock();
+  setTimeout(() => { if (!isPlaying) togglePlay(); }, 500);
+}
+
+function restart() {
+  exIdx = 0; stepIdx = 0;
+  releaseWakeLock();
+  showScreen('start-screen');
+  window.speechSynthesis.cancel();
+}
+
+// ═══════════════════════════════
+// BUILD START LIST
+// ═══════════════════════════════
+function buildStartList() {
+  const list = document.getElementById('start-list');
+  EXERCISES.forEach(ex => {
+    const div = document.createElement('div');
+    div.className = 'ex-list-item';
+    div.innerHTML = `<span class="ex-list-num">${String(ex.num).padStart(2,'0')}</span>
+      <span class="ex-list-name">${ex.name}</span>
+      <span class="ex-list-time">${ex.totalTime}</span>`;
+    list.appendChild(div);
+  });
+}
+
+buildStartList();
+
+// ═══════════════════════════════
+// WAKE LOCK — Bildschirm bleibt an
+// ═══════════════════════════════
+let wakeLock = null;
+
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+  } catch(e) {
+    console.log('Wake Lock nicht verfügbar:', e);
+  }
+}
+
+async function releaseWakeLock() {
+  if (wakeLock) {
+    await wakeLock.release();
+    wakeLock = null;
+  }
+}
+
+// Wenn Tab wieder sichtbar wird (z.B. nach Sperrbildschirm) → neu anfordern
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && isPlaying) {
+    await requestWakeLock();
+  }
+});
+</script>
+</body>
+</html>
